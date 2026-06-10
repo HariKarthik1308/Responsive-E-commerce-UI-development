@@ -186,7 +186,11 @@ body {
     height: 50px;
     overflow: hidden;
 }
-
+.product-grid h2 {
+    text-align: center;
+    width: 100%;
+    padding: 40px;
+}
 .product-price {
     color: #007bff;
     font-size: 20px;
