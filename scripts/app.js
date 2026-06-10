@@ -8,14 +8,15 @@ hamburger.addEventListener("click", () => {
 const productGrid = document.getElementById("productGrid");
 const cartCount = document.querySelector(".cart-count");
 
-let cartItems = 0;
+// Load existing cart
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+cartCount.textContent = cart.length;
 
 // Loading message
 productGrid.innerHTML = "<h2>Loading products...</h2>";
 
 async function loadProducts() {
     try {
-        // Check cache first
         const cachedProducts = localStorage.getItem("products");
 
         if (cachedProducts) {
@@ -31,35 +32,45 @@ async function loadProducts() {
 
         const products = await response.json();
 
-        // Save to cache
-        localStorage.setItem("products", JSON.stringify(products));
+        localStorage.setItem(
+            "products",
+            JSON.stringify(products)
+        );
 
         displayProducts(products);
 
     } catch (error) {
+
         productGrid.innerHTML = `
             <h2 style="color:red;">
                 Unable to load products. Please try again later.
             </h2>
         `;
+
         console.error(error);
     }
 }
 
 function displayProducts(products) {
+
     productGrid.innerHTML = "";
 
     products.forEach(product => {
+
         const card = document.createElement("div");
 
         card.classList.add("product-card");
 
         card.innerHTML = `
-            <img src="${product.image}"
-                 alt="${product.title}"
-                 loading="lazy">
+            <a href="product.html?id=${product.id}">
+                <img
+                    src="${product.image}"
+                    alt="${product.title}"
+                    loading="lazy">
+            </a>
 
             <div class="product-info">
+
                 <h3>${product.title}</h3>
 
                 <p class="product-price">
@@ -73,14 +84,26 @@ function displayProducts(products) {
                 <button class="add-cart-btn">
                     Add to Cart
                 </button>
+
             </div>
         `;
 
-        const button = card.querySelector(".add-cart-btn");
+        const button =
+            card.querySelector(".add-cart-btn");
 
         button.addEventListener("click", () => {
-            cartItems++;
-            cartCount.textContent = cartItems;
+
+            let cart =
+                JSON.parse(localStorage.getItem("cart")) || [];
+
+            cart.push(product.id);
+
+            localStorage.setItem(
+                "cart",
+                JSON.stringify(cart)
+            );
+
+            cartCount.textContent = cart.length;
         });
 
         productGrid.appendChild(card);
